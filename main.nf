@@ -2,20 +2,11 @@
 //base folder for seqence inputs
 params.in = "$baseDir/test-input/*.fas.gz"
 params.outdir = "$baseDir/out"
+params.gene_result_column = 1
 
 
 //this is the folder structure of bactopia output
 params.input_structure = "**/main/assembler/*.fna.gz"
-
-// options.args = [
-//     "--truncLength ${params.trunclength}",
-//     "--sort-order ${params.sortorder}",
-//     "--genomesize ${params.genomesize}",
-//     "--mindepth ${params.mindepth}",
-//     "--kmerlength ${params.kmerlength}",
-//     "--sketch-size ${params.sketchsize}",
-//     params.save_sketches ? "--save-sketches sketches/" : "",
-// ].join(' ').replaceAll("\\s{2,}", " ").trim()
 
 process MEFINDER{
     publishDir "$baseDir/out"
@@ -26,7 +17,7 @@ process MEFINDER{
     output:
         path "${seq}.mge_mge_sequences.fna"
         path "${seq}.mge_result.txt"
-        path "${seq}.mge.csv"
+        path "${seq}.mge.csv", emit: csv
 
     """
     mefinder find --contig $seq ${seq}.mge
@@ -47,16 +38,63 @@ process UNZIP{
     """
 }
 
+process CSV{
+    debug true
+
+    publishDir "$baseDir/out", mode: 'copy'
+
+    input:
+    val tables
+
+    output:
+    path 'mge_results.csv'
+
+    exec:
+    gene_list = []
+    results = [:]
+    tables.each { table ->
+        sample_genes = []
+
+        table
+            .splitCsv(header: true, skip:5)
+            .each {row -> sample_genes.push(row.name)}
+
+        sample_genes.unique()
+        gene_list += sample_genes
+        sample_name = table.name.split("\\.").first()
+        results[sample_name] = sample_genes
+    }
+    result_table = ""
+    gene_list.unique().sort()
+    results = results.sort()
+    results.each{ sample_name, genes ->
+        result_row = []
+        gene_list.each { gene ->
+            if (genes.contains(gene)){
+                result_row += 1
+            } else{
+                result_row += 0
+            }
+        }
+        result_row.push(sample_name)
+        result_table += result_row.join(',') + "\n"
+    }
+
+    gene_list.push('Isolate')
+    headers = gene_list.join(',') + "\n"
+    result_table = headers + result_table
+
+    csv_file = task.workDir.resolve('mge_results.csv')
+    csv_file.text = result_table
+}
+
 workflow{
     input_seqs = Channel
         .fromPath("$baseDir/in/*")
 
     UNZIP(input_seqs)
-    // UNZIP.out.view()
-    // Channel.fromList(UNZIP.out).view()
-   MEFINDER(UNZIP.out)
-    // INFILE.out.view()
 
-    // result = run_ksnp()
-    // result.view { "Result: ${it}" }
+    MEFINDER(UNZIP.out)
+    CSV(MEFINDER.out.csv.collect())
+
 }
