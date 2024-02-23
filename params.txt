@@ -1,0 +1,45 @@
+sage: mobileElementFinder.py find [OPTIONS] OUTPUT
+
+  Find mobile element in sequence data.
+
+Options:
+  -c, --contig PATH        Specify pre-assembled contigs to perform analysis
+                           on.
+
+  -f, --fq-file PATH       Sequencing files in fastq format. Only used for
+                           annotating sequence depth in GFF files (Optional)
+
+  --config FILE            Path to user defined config
+  -j, --json               Write output in json format.
+  -g, --gff                Write MGE location on contig in gff format.
+  -t, --threads INTEGER    Number of threads [default: 1]
+  --min-coverage FLOAT     Minimum coverage
+  --max-evalue INTEGER     Maximum alignment e-value
+  --temp-dir PATH          Set directory for temporary files.
+  --kma-path TEXT          Path to KMA, if the executable is not in PATH
+  --blastn-path TEXT       Path to Blast, if the executable is not in PATH
+  --makeblastdb-path TEXT  Path to Blast, if the executable is not in PATH
+  --db-path PATH           Path to MGEdb
+  --help                   Show this message and exit.
+  ```
+
+- **threads** :: set number of processor threads the software is allowed to use
+- **min-coverage** :: set the threshold for minimum total alignment coverage of
+  blast HSPs. Valid range 0 < x < 1.
+- **min-identity** :: set the threshold for minimum total sequence identity
+  between template and query. Valid range 0 < x < 1.
+- **json** :: Write extended output in machine readable json format.
+- **makeblastdb-path** :: Set custom path to blast.
+- **db-path** :: Path to MGEdb. This is primarily used if Mobile Element Finder
+is not installed as a python package.
+
+  Using a custom configuration file is only recommended for advanced users. An
+  example configuration file is located in `./example.config.ini`. To specify the
+  path of your configuration file use the flag `--config`.
+
+## Update MobileElementFinder
+
+MobileElementFinder is updated with pip.
+
+```bash
+pip install -e . --upgrade
