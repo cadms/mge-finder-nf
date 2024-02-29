@@ -9,33 +9,33 @@ params.gene_result_column = 1
 params.input_structure = "**/main/assembler/*.fna.gz"
 
 process MEFINDER{
-    publishDir "$baseDir/out"
+    //we're saving it as {sample_name}/{results_files}
+    publishDir (
+        path: "$baseDir/out",
+        saveAs: { fn -> "${((fn =~ /([^.\s]+)/)[0][0])}/$fn" }
+    )
 
     input:
-        file seq
+    file fasta
 
     output:
-        path "${seq}.mge_mge_sequences.fna"
-        path "${seq}.mge_result.txt"
-        path "${seq}.mge.csv", emit: csv
+    path "${fasta.getSimpleName()}.mge_mge_sequences.fna"
+    path "${fasta.getSimpleName()}.mge_result.txt"
+    path "${fasta.getSimpleName()}.mge.csv", emit: csv
 
+    script:
+    def prefix = fasta.getSimpleName()
+    def is_compressed = fasta.getName().endsWith(".gz") ? true : false
+    def fasta_name = fasta.getName().replace(".gz", "")
     """
-    mefinder find --contig $seq ${seq}.mge
+    if [ "$is_compressed" == "true" ]; then
+        gzip -c -d $fasta > $fasta_name
+    fi
+
+    mkdir $prefix
+    mefinder find --contig $fasta_name ${prefix}.mge
     """
-}
 
-
-process UNZIP{
-    input:
-    file '*'
-
-    output:
-    path "unzipped_seqs/*"
-
-    """
-    mkdir unzipped_seqs
-    for f in *.gz ; do gunzip -c "\$f" > unzipped_seqs/"\${f%.*}" ; done
-    """
 }
 
 process CSV{
@@ -90,11 +90,10 @@ process CSV{
 
 workflow{
     input_seqs = Channel
-        .fromPath("$baseDir/in/*")
+        .fromPath(params.in)
 
-    UNZIP(input_seqs)
 
-    MEFINDER(UNZIP.out)
+    MEFINDER(input_seqs)
     CSV(MEFINDER.out.csv.collect())
 
 }
