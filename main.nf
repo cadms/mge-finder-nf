@@ -1,8 +1,9 @@
 #!/usr/bin/env nextflow
-//base folder for seqence inputs
-params.in = "$baseDir/test-input/*.fas.gz"
-params.outdir = "$baseDir/out"
+
+params.input = "$baseDir/in"
+params.output = "$baseDir/out"
 params.gene_result_column = 1
+params.gzip = true
 
 
 //this is the folder structure of bactopia output
@@ -11,7 +12,7 @@ params.input_structure = "**/main/assembler/*.fna.gz"
 process MEFINDER{
     //we're saving it as {sample_name}/{results_files}
     publishDir (
-        path: "$baseDir/out",
+        path: params.output,
         saveAs: { fn -> "${((fn =~ /([^.\s]+)/)[0][0])}/$fn" }
     )
 
@@ -19,8 +20,8 @@ process MEFINDER{
     file fasta
 
     output:
-    path "${fasta.getSimpleName()}.mge_mge_sequences.fna"
-    path "${fasta.getSimpleName()}.mge_result.txt"
+    path "${fasta.getSimpleName()}.mge_mge_sequences.fna", emit: fna
+    path "${fasta.getSimpleName()}.mge_result.txt", emit: txt
     path "${fasta.getSimpleName()}.mge.csv", emit: csv
 
     script:
@@ -41,7 +42,7 @@ process MEFINDER{
 process CSV{
     debug true
 
-    publishDir "$baseDir/out", mode: 'copy'
+    publishDir params.output, mode: 'copy'
 
     input:
     val tables
@@ -88,12 +89,35 @@ process CSV{
     csv_file.text = result_table
 }
 
+process ZIP{
+    publishDir params.output, mode: 'copy'
+
+    input:
+    path files
+    path csv
+
+    output:
+    path '*.tar.gz'
+
+    """
+    current_date=\$(date +"%Y-%m-%d")
+    outfile="mefinder_\${current_date}.tar.gz"
+    tar -chzf \${outfile} ${files.join(' ')} $csv
+    """
+}
+
 workflow{
     input_seqs = Channel
-        .fromPath(params.in)
-
+        .fromPath("$params.input/*{fas,gz,fasta,fsa,fsa.gz,fas.gz}")
 
     MEFINDER(input_seqs)
-    CSV(MEFINDER.out.csv.collect())
-
+    results = MEFINDER.out
+    CSV(results.csv.collect())
+    if (params.gzip){
+        all_results = results.csv
+                .mix(results.txt)
+                .mix(results.fna)
+                .collect()
+        ZIP(all_results,CSV.out)
+    }
 }
