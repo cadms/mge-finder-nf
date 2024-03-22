@@ -3,7 +3,7 @@
 params.input = "$baseDir/in"
 params.output = "$baseDir/out"
 params.gene_result_column = 1
-params.gzip = true
+params.gzip = false
 
 
 //this is the folder structure of bactopia output
@@ -101,7 +101,7 @@ process ZIP{
 
     """
     current_date=\$(date +"%Y-%m-%d")
-    outfile="mefinder_\${current_date}.tar.gz"
+    outfile="plasmindfinder_\${current_date}.tar.gz"
     tar -chzf \${outfile} ${files.join(' ')} $csv
     """
 }
