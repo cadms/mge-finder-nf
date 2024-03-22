@@ -10,7 +10,7 @@ WORKDIR /usr/src/
 RUN set -exu                                                                                                                \
   # Install linux tools                                                                                                     \
   && apt-get update                                                                                                         \
-  && apt-get install -y wget                                                                                                \
+  && apt-get install -y wget procps                                                                                                 \
   && rm -rf /var/lib/apt/lists/*                                                                                            \
   # Install blast                                                                                                           \
   && wget -q ftp://ftp.ncbi.nlm.nih.gov/blast/executables/blast+/$BLAST_VERSION/ncbi-blast-$BLAST_VERSION+-x64-linux.tar.gz \
