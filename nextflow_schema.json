@@ -31,7 +31,7 @@
         "optional_parameters": {
             "title": "Optional Parameters",
             "type": "object",
-            "description": "Optional BacMet",
+            "description": "Optional MGE Finder",
             "default": "",
             "properties": {
                 "gzip": {
