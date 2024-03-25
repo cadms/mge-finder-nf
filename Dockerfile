@@ -1,7 +1,7 @@
 FROM python:3.7-slim as python
 # TODO switch to alpine
 
-ENV BLAST_VERSION="2.10.0"   \
+ENV BLAST_VERSION="2.12.0"   \
     BLASTDB="/usr/src/db"
 
 # Copy executables
