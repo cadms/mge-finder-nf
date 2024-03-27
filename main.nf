@@ -10,6 +10,7 @@ params.gzip = false
 params.input_structure = "**/main/assembler/*.fna.gz"
 
 process MEFINDER{
+    scratch true
     //we're saving it as {sample_name}/{results_files}
     publishDir (
         path: params.output,
