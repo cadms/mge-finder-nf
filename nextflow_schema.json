@@ -38,6 +38,21 @@
                     "type": "boolean",
                     "description": "If set to true results will be gzipped for easy downloading. ",
                     "fa_icon": "fas fa-file-archive"
+                },
+                "min_coverage": {
+                    "type": "number",
+                    "description": "Set the threshold for minimum total alignment coverage of blast HSPs. Valid range 0 < x < 1",
+                    "fa_icon": "fas fa-umbrella"
+                },
+                "min_identity": {
+                    "type": "number",
+                    "description": "set the threshold for minimum total sequence identity between template and query. Valid range 0 < x < 1",
+                    "fa_icon": "fas fa-id-badge"
+                },
+                "max_evalue": {
+                    "type": "integer",
+                    "description": "Maximum alignment(BLAST) e-value",
+                    "fa_icon": "fas sort-numeric-desc "
                 }
             }
         }

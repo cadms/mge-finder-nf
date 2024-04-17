@@ -1,13 +1,23 @@
 #!/usr/bin/env nextflow
 
+//this is the folder structure of bactopia output
+params.input_structure = "**/main/assembler/*.fna.gz"
 params.input = "$baseDir/in"
 params.output = "$baseDir/out"
 params.gene_result_column = 1
 params.gzip = false
+params.min_coverage = 0.6
+params.min_identity = false
+params.max_evalue = false
 
+options = {}
+options.args = []
+if (params.min_coverage) options.args.push("--min-coverage ${params.min_coverage}")
+if (params.min_identity) options.args.push("--min-identity ${params.min_identity}")
+if (params.max_evalue) options.args.push("--max-evalue ${params.max_evalue}")
 
-//this is the folder structure of bactopia output
-params.input_structure = "**/main/assembler/*.fna.gz"
+// args = options.args.join(' ').replaceAll("\\s{2,}", " ").trim()
+
 
 process MEFINDER{
     scratch true
@@ -35,7 +45,7 @@ process MEFINDER{
     fi
 
     mkdir $prefix
-    mefinder find --contig $fasta_name ${prefix}.mge
+    mefinder find ${options.args.join(' ')} --contig $fasta_name ${prefix}.mge
     """
 
 }
