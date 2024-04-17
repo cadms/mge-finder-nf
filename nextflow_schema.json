@@ -52,7 +52,7 @@
                 "max_evalue": {
                     "type": "integer",
                     "description": "Maximum alignment(BLAST) e-value",
-                    "fa_icon": "fas sort-numeric-desc "
+                    "fa_icon": "fas fa-etsy"
                 }
             }
         }
