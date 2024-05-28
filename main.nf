@@ -13,7 +13,7 @@ params.max_evalue = false
 options = {}
 options.args = []
 if (params.min_coverage) options.args.push("--min-coverage ${params.min_coverage}")
-if (params.min_identity) options.args.push("--min-identity ${params.min_identity}")
+//if (params.min_identity) options.args.push("--min-identity ${params.min_identity}")
 if (params.max_evalue) options.args.push("--max-evalue ${params.max_evalue}")
 
 // args = options.args.join(' ').replaceAll("\\s{2,}", " ").trim()
