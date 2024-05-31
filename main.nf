@@ -6,20 +6,31 @@ params.input = "$baseDir/in"
 params.output = "$baseDir/out"
 params.gene_result_column = 1
 params.gzip = false
-params.min_coverage = 0.6
-params.min_identity = false
-params.max_evalue = false
+params.min_coverage = 0.9
+params.min_identity = 0.8
+params.max_evalue = -6
 
-options = {}
-options.args = []
-if (params.min_coverage) options.args.push("--min-coverage ${params.min_coverage}")
-//if (params.min_identity) options.args.push("--min-identity ${params.min_identity}")
-if (params.max_evalue) options.args.push("--max-evalue ${params.max_evalue}")
+//a config file must be specified for some options instead of use args
+def meconfig = """
+[blast]
+word_size = 11
+soft_masking = no
+task = megablast
 
-// args = options.args.join(' ').replaceAll("\\s{2,}", " ").trim()
+[putative_composite_transposon]
+max_len = 52452
+min_ir_segment_length = 60
+min_ir_aln_length = 20
 
+[validation]
+max_truncation = 100
+coverage = ${params.min_coverage}
+identity = ${params.max_evalue}
+e_value = ${params.max_evalue}
+"""
 
 process MEFINDER{
+    debug true
     scratch true
     //we're saving it as {sample_name}/{results_files}
     publishDir (
@@ -44,9 +55,12 @@ process MEFINDER{
         gzip -c -d $fasta > $fasta_name
     fi
 
+    echo "$meconfig" > config_file
+
     mkdir $prefix
-    mefinder find ${options.args.join(' ')} --contig $fasta_name ${prefix}.mge
+    mefinder find --config config_file --contig $fasta_name ${prefix}.mge
     """
+
 
 }
 

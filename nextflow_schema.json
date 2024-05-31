@@ -41,17 +41,17 @@
                 },
                 "min_coverage": {
                     "type": "number",
-                    "description": "Set the threshold for minimum total alignment coverage of blast HSPs. Valid range 0 < x < 1",
+                    "description": "Set the threshold for minimum total alignment coverage of blast HSPs. Valid range 0 < x < 1 (Default is 0.9)",
                     "fa_icon": "fas fa-umbrella"
                 },
                 "min_identity": {
                     "type": "number",
-                    "description": "set the threshold for minimum total sequence identity between template and query. Valid range 0 < x < 1",
+                    "description": "set the threshold for minimum total sequence identity between template and query. Valid range 0 < x < 1 (Default is 0.8)",
                     "fa_icon": "fas fa-id-badge"
                 },
                 "max_evalue": {
                     "type": "integer",
-                    "description": "Maximum alignment(BLAST) e-value",
+                    "description": "Maximum alignment(BLAST) e-value (Default is -6)",
                     "fa_icon": "fas fa-etsy"
                 }
             }
